@@ -5,23 +5,23 @@ class SudokuSolver {
     switch (row)
     {
       case "A":
-        return result += 1 * column;
+        return result += 0 + column;
       case "B":
-        return result += 2 * column;
+        return result += 9 + column;
       case "C":
-        return result += 3 * column;
+        return result += 18 + column;
       case "D":
-        return result += 4 * column;
+        return result += 27 + column;
       case "E":
-        return result += 5 * column;
+        return result += 36 + column;
       case "F":
-        return result += 6 * column;
+        return result += 45 + column;
       case "G":
-        return result += 7 * column;
+        return result += 54 + column;
       case "H":
-        return result += 8 * column;
+        return result += 63 + column;
       case "I":
-        return result += 9 * column;
+        return result += 72 + column;
     }
   }
 
@@ -29,23 +29,23 @@ class SudokuSolver {
   {
     switch (row)
     {
-      case 0:
-        return "A";
       case 1:
-        return "B";
+        return "A";
       case 2:
-        return "C";
+        return "B";
       case 3:
-        return "D";
+        return "C";
       case 4:
-        return "E";
+        return "D";
       case 5:
-        return "F";
+        return "E";
       case 6:
-        return "G";
+        return "F";
       case 7:
-        return "H";
+        return "G";
       case 8:
+        return "H";
+      case 9:
         return "I";
     }
   }
@@ -110,7 +110,7 @@ class SudokuSolver {
     */
    
     //Get current value index
-    let currentIndex = this.getCoordinateToIndex(row, column);
+    let currentIndex = this.getCoordinateToIndex(row, parseInt(column));
     let checkIndexs;
     //Get whole row index
     switch (row)
@@ -167,36 +167,36 @@ class SudokuSolver {
     */
 
     //Get current value index
-    let currentIndex = this.getCoordinateToIndex(row, column);
+    let currentIndex = this.getCoordinateToIndex(row, parseInt(column));
     let checkIndexs;
     //Get whole column index
     switch (column)
     {
-      case "A":
+      case "1":
         checkIndexs = [0,9,18,27,36,45,54,63,72];
       break;
-      case "B":
+      case "2":
         checkIndexs = [1,10,19,28,37,46,55,64,73];
       break;
-      case "C":
+      case "3":
         checkIndexs = [2,11,20,29,38,47,56,65,74];
       break;
-      case "D":
+      case "4":
         checkIndexs = [3,12,21,30,39,48,57,66,75];
       break;
-      case "E":
+      case "5":
         checkIndexs = [4,13,22,31,40,49,58,67,76];
       break;
-      case "F":
+      case "6":
         checkIndexs = [5,14,23,32,41,50,59,68,77];
       break;
-      case "G":
+      case "7":
         checkIndexs = [6,15,24,33,42,51,60,69,78];
       break;
-      case "H":
+      case "8":
         checkIndexs = [7,16,25,34,43,52,61,70,79];
       break;
-      case "I":
+      case "9":
         checkIndexs = [8,17,26,35,44,53,62,71,80];
       break;
     }
@@ -217,7 +217,7 @@ class SudokuSolver {
     GHI1-3: 54,55,56,63,64,65,72,73,74 GHI4-6: 57,58,59,66,67,68,75,76,77 GHI7-9: 60,61,62,69,70,71,78,79,80
   */
 
-    let currentIndex = this.getCoordinateToIndex(row, column);
+    let currentIndex = this.getCoordinateToIndex(row, parseInt(column));
     let checkIndexs;
     if (row === "A" || row === "B" || row === "C") {
       if (column <= 3 ) {
@@ -258,35 +258,59 @@ class SudokuSolver {
       if (checkIndexs[i] === currentIndex) continue;
       if (puzzleString[checkIndexs[i]] === value) return false;
     }
+
+    return true;
   }
 
   //Using backtracking aka Brute-force search to solve the sudoku;
   //Reference: https://stackoverflow.com/questions/62309734/sudoku-solver-with-javascript
   solve(puzzleString) {
-    for (let row = 0; row < 9; row++ )
+    for (let row = 1; row <= 9; row++ )
     {
-      for (let col = 0; col < 9; col++ )
-      {
+      for (let col = 1; col <= 9; col++ )
+      {  
         if (puzzleString[this.getCoordinateToIndex(this.rowNumberToRow(row), col)] === ".")
         {
           //Check from 1-9 if ok, apply the value then loop
           for (let i = 1; i <= 9; i++ )
           {
-
-            if (this.checkColPlacement(puzzleString, this.rowNumberToRow(row), col, i) &&
-              this.checkRowPlacement(puzzleString, this.rowNumberToRow(row), col, i) &&
-              this.checkRegionPlacement(puzzleString, this.rowNumberToRow(row), col,i))
+            
+            if (this.checkColPlacement(puzzleString, this.rowNumberToRow(row), col.toString(), i.toString()) &&
+              this.checkRowPlacement(puzzleString, this.rowNumberToRow(row), col.toString(), i.toString()) &&
+              this.checkRegionPlacement(puzzleString, this.rowNumberToRow(row), col.toString(),i.toString()))
               {
-                puzzleString[this.getCoordinateToIndex(this.rowNumberToRow(row),col)] = i;
+                puzzleString[this.getCoordinateToIndex(this.rowNumberToRow(row),col)] = i.toString();
                 if (this.solve(puzzleString)) return puzzleString;
               }
-
-              puzzleString[this.getCoordinateToIndex(this.rowNumberToRow(row),col)] = ".";
-              return false;
-          }          
+          }
+          
+          puzzleString[this.getCoordinateToIndex(this.rowNumberToRow(row),col)] = ".";
+          return false; 
         }
       }
     }
+
+    return puzzleString;
+  }
+
+  //After Completed functional requirement I found the test need to write the all validation in controllers D:
+  //Copy the whole validation in routes, may revamp it after all test passed.
+  isValidPuzzle(puzzleString)
+  {
+    let puzzleRegex = /^[123456789.]$/;
+    if (puzzleString.length !== 81)
+    {
+      return "Expected puzzle to be 81 characters long" ;
+    }
+
+    puzzleString = puzzleString.split('');
+
+    if (puzzleString.some(v => !puzzleRegex.test(v)))
+    {
+      return "Invalid characters in puzzle";
+    }
+
+    return true;
   }
 }
 
